@@ -10,4 +10,5 @@ add_executable(MultArgPassing MultArgPassing.c)
 add_executable(ArgPassingError ArgPassingError.c)
 add_executable(ThreadJoin ThreadJoin.c)
 target_link_libraries(ThreadJoin m)
+add_executable(StackMng StackMng.c)
 
