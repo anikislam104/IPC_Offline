@@ -8,4 +8,6 @@ add_executable(Practice ThreadCreate.c)
 add_executable(ArgPassing ArgPassing.c)
 add_executable(MultArgPassing MultArgPassing.c)
 add_executable(ArgPassingError ArgPassingError.c)
+add_executable(ThreadJoin ThreadJoin.c)
+target_link_libraries(ThreadJoin m)
 
