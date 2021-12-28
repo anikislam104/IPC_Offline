@@ -20,6 +20,8 @@ int main (int argc, char *argv[]) {
             exit(-1);
         }
     }
-    pthread_exit(NULL);
+    for (int i = 0; i < NUM_THREADS; ++i) {
+        pthread_join(threads[i],NULL);
+    }
     return  0;
 }
