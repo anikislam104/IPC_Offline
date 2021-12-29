@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include "unistd.h"
 #define NUM_THREADS	8
+
 char *messages[NUM_THREADS];
 
 struct thread_data
@@ -52,8 +53,7 @@ int main(int argc, char *argv[])
         thread_data_array[t].sum = sum;
         thread_data_array[t].message = messages[t+1];
         printf("Creating thread %d\n", t);
-        rc = pthread_create(&threads[t], NULL, PrintHello, (void *)
-                &thread_data_array[t]);
+        rc = pthread_create(&threads[t], NULL, PrintHello, (void *)&thread_data_array[t]);
         if (rc) {
             printf("ERROR; return code from pthread_create() is %d\n", rc);
             exit(-1);
