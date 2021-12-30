@@ -3,27 +3,30 @@
 #include <stdlib.h>
 #include "unistd.h"
 #include "semaphore.h"
-#define NUM_THREADS	1
+#define NUM_THREADS	2
 #define M 5
 #define N 3
 #define P 5
 #define w 2
 #define x 4
 #define y 4
-#define z 4
+#define z 1
 sem_t kioskFull;
 pthread_mutex_t kiosk;
+pthread_mutex_t spkiosk;
 pthread_mutex_t belt;
 pthread_mutex_t boarding;
+pthread_mutex_t vipCh;
 int TIME=0;
 struct Boarding{
     int passenger[M*N*P];
     int currentPassenger;
+    sem_t boarding;
 };
 struct VIPchannel{
     int passengerGoing[M*N*P];
     int passengerWaiting[M*N*P];
-    int PassengerComingBack[M*N*P];
+    int passengerComingBack[M*N*P];
     int going;
     int waiting;
     int comingBack;
@@ -53,6 +56,7 @@ struct Airport{
     struct Belt belts[N];
     struct Boarding boarding;
     struct VIPchannel viPchannel;
+    struct Kiosk specialKiosk;
 };
 struct Airport airport;
 struct passenger passengerArray[NUM_THREADS];
@@ -129,6 +133,62 @@ void passBoarding(int passID){
     }
 }
 
+int addVIPChannelComingBack(int passID){
+    if(airport.viPchannel.going==0 && airport.viPchannel.waiting==0){
+        airport.viPchannel.passengerComingBack[airport.viPchannel.comingBack]=passID;
+        airport.viPchannel.comingBack++;
+        return 1;
+    }
+    else{
+        return 0;
+    }
+
+}
+
+void passComingBack(int passID){
+    for(int i=0;i<airport.viPchannel.comingBack;i++){
+        if(airport.viPchannel.passengerComingBack[i]==passID){
+            for(int j=i;j<airport.viPchannel.comingBack-1;j++){
+                airport.viPchannel.passengerComingBack[j]=airport.viPchannel.passengerComingBack[j+1];
+            }
+            airport.viPchannel.passengerComingBack[airport.viPchannel.comingBack-1]=-1;
+            airport.viPchannel.comingBack--;
+            break;
+        }
+    }
+}
+
+int addGoing(int passID){
+    if(airport.viPchannel.comingBack==0){
+        airport.viPchannel.passengerGoing[airport.viPchannel.going]=passID;
+        airport.viPchannel.going++;
+        return 1;
+    }
+    else{
+        return 0;
+    }
+}
+
+void passGoing(int passID){
+    for(int i=0;i<airport.viPchannel.going;i++){
+        if(airport.viPchannel.passengerGoing[i]==passID){
+            for(int j=i;j<airport.viPchannel.going-1;j++){
+                airport.viPchannel.passengerGoing[j]=airport.viPchannel.passengerGoing[j+1];
+            }
+            airport.viPchannel.passengerGoing[airport.viPchannel.going-1]=-1;
+            airport.viPchannel.going--;
+            break;
+        }
+    }
+}
+
+void passSpecialKiosk(int pass){
+    airport.specialKiosk.passengers[airport.specialKiosk.currentPassenger-1] = -1;
+    //airport.viPchannel.comingBack=0;
+    printf("%d\n",airport.viPchannel.comingBack);
+    airport.specialKiosk.currentPassenger--;
+}
+
 int random=0;
 void *Process(void *threadarg) {
     int passID,vip,ptime;
@@ -188,18 +248,100 @@ void *Process(void *threadarg) {
         //showBelt(kioskIndex,beltIndex);
 
         //BOARDING
+        //sem_wait(&airport.boarding.boarding);
         ptime++;
         printf("Passenger %d has started waiting to be boarded at time %d\n",passID,ptime);
         addPassengerInBoardingLine(passID);
         ptime+=(airport.boarding.currentPassenger-1)*y;
-        pthread_mutex_lock(&boarding);
-        printf("Passenger %d has started boarding the plane at time %d\n",passID,ptime);
-        ptime+=y;
-        passBoarding(passID);
-        printf("Passenger %d has boarded the plane at time %d\n",passID,ptime);
-        pthread_mutex_unlock(&boarding);
+        //pthread_mutex_lock(&boarding);
+        if(passID==0) {
+            printf("Passenger %d has started boarding the plane at time %d\n", passID, ptime);
+            ptime += y;
+            //sem_wait(&airport.boarding.boarding);
+            pthread_mutex_lock(&boarding);
+            passBoarding(passID);
+            pthread_mutex_unlock(&boarding);
+            //sem_post(&airport.boarding.boarding);
+            printf("Passenger %d has boarded the plane at time %d\n", passID, ptime);
+        }
+        else{
+            //sem_wait(&airport.boarding.boarding);
+//            pthread_mutex_lock(&boarding);
+            printf("Passenger %d has started boarding the plane at time %d\n", passID, ptime);
+            printf("Passenger %d has lost his boarding pass.\nNow he has to go back to kiosk via VIP channel at time %d\n",passID,ptime);
+            int isComingBack=0;
+            while (isComingBack==0){
+                if(addVIPChannelComingBack(passID)==1){
+                    ptime++;
+                    isComingBack=1;
+                    printf("Passenger %d is going back to special kiosk via VIP channel at time %d\n",passID,ptime);
+
+                    //sem_post(&airport.boarding.boarding);
+                }
+
+            }
+           //pthread_mutex_unlock(&boarding);
+
+            //SPECIAL KIOSK
+            pthread_mutex_lock(&vipCh);
+            passComingBack(passID);
+            //printf("%d",airport.viPchannel.comingBack);
+            ptime+=z;
+            pthread_mutex_unlock(&vipCh);
+
+            sem_wait(&airport.specialKiosk.kioskFull);
+            printf("Passenger %d has started self check-in Special Kiosk  at time %d\n", passID,ptime);
+            pthread_mutex_lock(&spkiosk);
+            airport.specialKiosk.passengers[airport.specialKiosk.currentPassenger] = passID;
+            airport.specialKiosk.currentPassenger++;
+            //showKiosk(kioskIndex);
+            sleep(w);
+            ptime+=w;
+            pthread_mutex_unlock(&spkiosk);
+
+            printf("Passenger %d has finished self check-in Special Kiosk  at time %d\n", passID,ptime);
+//            printf("%d\n",airport.viPchannel.comingBack);
+            passSpecialKiosk(passID);
+            sem_post(&airport.specialKiosk.kioskFull);
+            ptime++;
+
+
+            //VIP CHANNEL
+            airport.viPchannel.waiting++;
+
+            while(1){
+                ptime++;
+                if(addGoing(passID)==1){
+                    printf("Passenger %d is going back to boarding via VIP channel at time %d\n",passID,ptime);
+                    airport.viPchannel.waiting--;
+                    break;
+                }
+                //printf("looped");
+            }
+            passGoing(passID);
+            ptime+=z;
+            printf("Passenger %d has started waiting to be boarded at time %d\n",passID,ptime);
+            addPassengerInBoardingLine(passID);
+            ptime+=(airport.boarding.currentPassenger-1)*y;
+            printf("%d\n",airport.boarding.currentPassenger);
+            //pthread_mutex_lock(&boarding);
+                printf("Passenger %d has started boarding the plane at time %d\n", passID, ptime);
+                ptime += y;
+                //sem_wait(&airport.boarding.boarding);
+                pthread_mutex_lock(&boarding);
+                passBoarding(passID);
+                pthread_mutex_unlock(&boarding);
+                //sem_post(&airport.boarding.boarding);
+                printf("Passenger %d has boarded the plane at time %d\n", passID, ptime);
+
+        }
+//        pthread_mutex_unlock(&boarding);
+//        sem_post(&airport.boarding.boarding);
 
     }
+
+
+
     //FOR VIPs
     else{
         ptime+=7;
@@ -227,6 +369,7 @@ void *Process(void *threadarg) {
 
 
         //BOARDING
+        //sem_wait(&airport.boarding.boarding);
         ptime++;
         printf("Passenger %d has started waiting to be boarded at time %d\n",passID,ptime);
         addPassengerInBoardingLine(passID);
@@ -251,13 +394,18 @@ int main (int argc, char *argv[]) {
     pthread_mutex_init(&kiosk,NULL);
     pthread_mutex_init(&belt,NULL);
     pthread_mutex_init(&boarding,NULL);
-
+    pthread_mutex_init(&spkiosk,NULL);
+    pthread_mutex_init(&vipCh,NULL);
+    sem_init(&airport.specialKiosk.kioskFull,0,1);
     for(int i=0;i<M;i++){
             airport.kiosks[i].currentPassenger=0;
             airport.kiosks[i].maximumPassenger=1;
+            airport.specialKiosk.currentPassenger=0;
+            airport.specialKiosk.maximumPassenger=1;
             sem_init(&airport.kiosks[i].kioskFull,0,1);
             for(int k=0;k<airport.kiosks[i].maximumPassenger;k++){
                 airport.kiosks[i].passengers[k]=-1;
+                airport.specialKiosk.passengers[k]=-1;
                 //printf("Kiosk %d belt %d passenger number %d\n",i,j,k);
             }
     }
@@ -270,10 +418,17 @@ int main (int argc, char *argv[]) {
             //printf("Kiosk %d belt %d passenger number %d\n",i,j,k);
         }
     }
+    sem_init(&airport.boarding.boarding,0,1);
     airport.boarding.currentPassenger=0;
     for(int i=0;i<M*N*P;i++){
         airport.boarding.passenger[i]=-1;
+        airport.viPchannel.passengerGoing[i]=-1;
+        airport.viPchannel.passengerComingBack[i]=-1;
+        airport.viPchannel.passengerWaiting[i]=-1;
     }
+    airport.viPchannel.going=0;
+    airport.viPchannel.waiting=0;
+    airport.viPchannel.comingBack=0;
     //sem_init(&kioskFull,0,0);
     for(int t=0; t<NUM_THREADS; t++){
         passengerArray[t].id=t;
