@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include "unistd.h"
 #include "semaphore.h"
-#define NUM_THREADS	2
+#define NUM_THREADS	1
 #define M 5
 #define N 3
 #define P 5
@@ -186,6 +186,45 @@ void *Process(void *threadarg) {
         printf("Passenger %d has crossed the security check at time %d\n",passID,ptime);
 //
         //showBelt(kioskIndex,beltIndex);
+
+        //BOARDING
+        ptime++;
+        printf("Passenger %d has started waiting to be boarded at time %d\n",passID,ptime);
+        addPassengerInBoardingLine(passID);
+        ptime+=(airport.boarding.currentPassenger-1)*y;
+        pthread_mutex_lock(&boarding);
+        printf("Passenger %d has started boarding the plane at time %d\n",passID,ptime);
+        ptime+=y;
+        passBoarding(passID);
+        printf("Passenger %d has boarded the plane at time %d\n",passID,ptime);
+        pthread_mutex_unlock(&boarding);
+
+    }
+    //FOR VIPs
+    else{
+        ptime+=7;
+        kioskIndex = (random++)%M;
+        beltIndex =(random++)%N;
+        if(random==55) random=0;
+
+        //KIOSK CHECK-IN
+
+        sem_wait(&airport.kiosks[kioskIndex].kioskFull);
+        printf("Passenger %d has started self check-in Kiosk %d at time %d\n", passID, kioskIndex,ptime);
+        pthread_mutex_lock(&kiosk);
+        airport.kiosks[kioskIndex].passengers[airport.kiosks[kioskIndex].currentPassenger] = passID;
+        airport.kiosks[kioskIndex].currentPassenger++;
+        //showKiosk(kioskIndex);
+        sleep(w);
+        ptime+=w;
+        pthread_mutex_unlock(&kiosk);
+        printf("Passenger %d has finished self check-in Kiosk %d at time %d\n", passID, kioskIndex,ptime);
+        passKiosk(kioskIndex,passID);
+        sem_post(&airport.kiosks[kioskIndex].kioskFull);
+        ptime++;
+
+        //VIP CHANNEL
+
 
         //BOARDING
         ptime++;
