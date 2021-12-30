@@ -3,11 +3,11 @@
 #include <stdlib.h>
 #include "unistd.h"
 #include "semaphore.h"
-#define NUM_THREADS	16
-#define M 2
-#define N 3
+#define NUM_THREADS	7
+#define M 5
+#define N 1
 #define P 5
-#define w 4
+#define w 2
 #define x 4
 #define y 4
 #define z 4
@@ -102,7 +102,13 @@ void passBelt(int beltIndex,int passID){
         }
     }
 }
-
+int myBeltPosition(int beltIndex,int passID){
+    for(int i=0;i<airport.belts[beltIndex].currentPassenger;i++){
+        if(airport.belts[beltIndex].passengers[i]==passID){
+            return i;
+        }
+    }
+}
 int random=0;
 void *Process(void *threadarg) {
     int passID,vip,ptime;
@@ -131,14 +137,26 @@ void *Process(void *threadarg) {
         printf("Passenger %d has finished self check-in Kiosk %d at time %d\n", passID, kioskIndex,ptime);
         passKiosk(kioskIndex,passID);
         sem_post(&airport.kiosks[kioskIndex].kioskFull);
-//        pthread_mutex_lock(&belt);
-//        printf("Passenger %d is in the security check of Kiosk %d Belt %d\n", passID, kioskIndex, beltIndex);
-//        sleep(x);
-//        //passBelt(kioskIndex,beltIndex,passID);
-//        printf("Passenger %d is going out from Kiosk %d Belt %d\n", passID, kioskIndex, beltIndex);
-//        pthread_mutex_unlock(&belt);
-        //sem_post(&airport.kiosks[kioskIndex].belts[beltIndex].kioskFull);
+        ptime++;
 
+        //pthread_mutex_lock(&belt);
+        sem_wait(&airport.belts[beltIndex].beltFull);
+        printf("Passenger %d has started waiting for security check in belt %d from time %d\n", passID, beltIndex, ptime);
+        airport.belts[beltIndex].passengers[airport.belts[beltIndex].currentPassenger]=passID;
+        ptime+=airport.belts[beltIndex].currentPassenger*x;
+        airport.belts[beltIndex].currentPassenger++;
+        pthread_mutex_lock(&belt);
+        printf("Passenger %d has started the security check at time %d\n",passID,ptime);
+        ptime+=x;
+
+        sleep(x);
+        passBelt(beltIndex,passID);
+
+//        printf("Passenger %d is going out from Kiosk %d Belt %d\n", passID, kioskIndex, beltIndex);
+        pthread_mutex_unlock(&belt);
+        sem_post(&airport.belts[beltIndex].beltFull);
+        printf("Passenger %d has crossed the security check at time %d\n",passID,ptime);
+//
         //showBelt(kioskIndex,beltIndex);
 
 
