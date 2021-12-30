@@ -3,9 +3,9 @@
 #include <stdlib.h>
 #include "unistd.h"
 #include "semaphore.h"
-#define NUM_THREADS	7
+#define NUM_THREADS	2
 #define M 5
-#define N 1
+#define N 3
 #define P 5
 #define w 2
 #define x 4
@@ -14,6 +14,7 @@
 sem_t kioskFull;
 pthread_mutex_t kiosk;
 pthread_mutex_t belt;
+pthread_mutex_t boarding;
 int TIME=0;
 struct Boarding{
     int passenger[M*N*P];
@@ -109,6 +110,25 @@ int myBeltPosition(int beltIndex,int passID){
         }
     }
 }
+
+void addPassengerInBoardingLine(int passID){
+    airport.boarding.passenger[airport.boarding.currentPassenger]=1;
+    airport.boarding.currentPassenger++;
+}
+
+void passBoarding(int passID){
+    for(int i=0;i<airport.boarding.currentPassenger;i++){
+        if(airport.boarding.passenger[i]==passID){
+            for(int j=i;j<airport.boarding.currentPassenger-1;j++){
+                airport.boarding.passenger[j]=airport.boarding.passenger[j+1];
+            }
+            airport.boarding.passenger[airport.boarding.currentPassenger-1]=-1;
+            airport.boarding.currentPassenger--;
+            break;
+        }
+    }
+}
+
 int random=0;
 void *Process(void *threadarg) {
     int passID,vip,ptime;
@@ -125,6 +145,9 @@ void *Process(void *threadarg) {
         kioskIndex = (random++)%M;
         beltIndex =(random++)%N;
         if(random==55) random=0;
+
+        //KIOSK CHECK-IN
+
         sem_wait(&airport.kiosks[kioskIndex].kioskFull);
         printf("Passenger %d has started self check-in Kiosk %d at time %d\n", passID, kioskIndex,ptime);
         pthread_mutex_lock(&kiosk);
@@ -139,13 +162,18 @@ void *Process(void *threadarg) {
         sem_post(&airport.kiosks[kioskIndex].kioskFull);
         ptime++;
 
+
+        //SECURITY CHECK(BELT)
+
+
         //pthread_mutex_lock(&belt);
         sem_wait(&airport.belts[beltIndex].beltFull);
         printf("Passenger %d has started waiting for security check in belt %d from time %d\n", passID, beltIndex, ptime);
+        pthread_mutex_lock(&belt);
         airport.belts[beltIndex].passengers[airport.belts[beltIndex].currentPassenger]=passID;
         ptime+=airport.belts[beltIndex].currentPassenger*x;
         airport.belts[beltIndex].currentPassenger++;
-        pthread_mutex_lock(&belt);
+
         printf("Passenger %d has started the security check at time %d\n",passID,ptime);
         ptime+=x;
 
@@ -159,6 +187,17 @@ void *Process(void *threadarg) {
 //
         //showBelt(kioskIndex,beltIndex);
 
+        //BOARDING
+        ptime++;
+        printf("Passenger %d has started waiting to be boarded at time %d\n",passID,ptime);
+        addPassengerInBoardingLine(passID);
+        ptime+=(airport.boarding.currentPassenger-1)*y;
+        pthread_mutex_lock(&boarding);
+        printf("Passenger %d has started boarding the plane at time %d\n",passID,ptime);
+        ptime+=y;
+        passBoarding(passID);
+        printf("Passenger %d has boarded the plane at time %d\n",passID,ptime);
+        pthread_mutex_unlock(&boarding);
 
     }
     //pthread_mutex_unlock(&mutex);
@@ -172,6 +211,7 @@ int main (int argc, char *argv[]) {
     int rc;
     pthread_mutex_init(&kiosk,NULL);
     pthread_mutex_init(&belt,NULL);
+    pthread_mutex_init(&boarding,NULL);
 
     for(int i=0;i<M;i++){
             airport.kiosks[i].currentPassenger=0;
@@ -190,6 +230,10 @@ int main (int argc, char *argv[]) {
             airport.belts[i].passengers[k]=-1;
             //printf("Kiosk %d belt %d passenger number %d\n",i,j,k);
         }
+    }
+    airport.boarding.currentPassenger=0;
+    for(int i=0;i<M*N*P;i++){
+        airport.boarding.passenger[i]=-1;
     }
     //sem_init(&kioskFull,0,0);
     for(int t=0; t<NUM_THREADS; t++){
