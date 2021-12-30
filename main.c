@@ -35,15 +35,20 @@ struct Belt{
     int passengers[P];
     int currentPassenger;
     int maximumPassenger;
-    sem_t kioskFull;
+    sem_t beltFull;
 
 };
 struct Kiosk{
-    struct Belt belts[N];
+    //struct Belt belts[N];
+    int passengers[P*P];
+    int currentPassenger;
+    int maximumPassenger;
+    sem_t kioskFull;
 };
 
 struct Airport{
     struct Kiosk kiosks[M];
+    struct Belt belts[N];
     struct Boarding boarding;
     struct VIPchannel viPchannel;
 };
@@ -52,27 +57,27 @@ struct passenger passengerArray[NUM_THREADS];
 //struct Kiosk kiosks[M];
 
 int isKioskFull(int kioskIndex,int beltIndex){
-    if(airport.kiosks[kioskIndex].belts[beltIndex].currentPassenger==P){
+    if(airport.kiosks[kioskIndex].currentPassenger==P){
         return 1;
     } else{
         return 0;
     }
 }
 
-void showBelt(int kioskIndex,int beltIndex){
-    for(int i=0;i<airport.kiosks[kioskIndex].belts[beltIndex].currentPassenger;i++){
-        printf("%d\n",airport.kiosks[kioskIndex].belts[beltIndex].passengers[i]);
+void showKiosk(int kioskIndex){
+    for(int i=0;i<airport.kiosks[kioskIndex].currentPassenger;i++){
+        printf("%d\n",airport.kiosks[kioskIndex].passengers[i]);
     }
 }
 
-void passBelt(int kioskIndex,int beltIndex,int passID){
-    for(int i=0;i<airport.kiosks[kioskIndex].belts[beltIndex].currentPassenger;i++){
-        if(airport.kiosks[kioskIndex].belts[beltIndex].passengers[i]==passID){
-            for(int j=i;j<airport.kiosks[kioskIndex].belts[beltIndex].currentPassenger-1;j++){
-                airport.kiosks[kioskIndex].belts[beltIndex].passengers[j]=airport.kiosks[kioskIndex].belts[beltIndex].passengers[j+1];
+void passKiosk(int kioskIndex,int passID){
+    for(int i=0;i<airport.kiosks[kioskIndex].currentPassenger;i++){
+        if(airport.kiosks[kioskIndex].passengers[i]==passID){
+            for(int j=i;j<airport.kiosks[kioskIndex].currentPassenger-1;j++){
+                airport.kiosks[kioskIndex].passengers[j]=airport.kiosks[kioskIndex].passengers[j+1];
             }
-            airport.kiosks[kioskIndex].belts[beltIndex].passengers[airport.kiosks[kioskIndex].belts[beltIndex].currentPassenger-1]=-1;
-            airport.kiosks[kioskIndex].belts[beltIndex].currentPassenger--;
+            airport.kiosks[kioskIndex].passengers[airport.kiosks[kioskIndex].currentPassenger-1]=-1;
+            airport.kiosks[kioskIndex].currentPassenger--;
             break;
         }
     }
@@ -92,7 +97,7 @@ void *Process(void *threadarg) {
     if(vip==0) {
 //        while (hasEntered == 0) {
             kioskIndex = rand() % M;
-            beltIndex = rand() % N;
+           // beltIndex = rand() % N;
 //            //printf("kiosk idx %d belt idx %d\n",kioskIndex,beltIndex);
 //            int isFull = isKioskFull(kioskIndex, beltIndex);
 //            if (isFull == 1) {
@@ -107,27 +112,28 @@ void *Process(void *threadarg) {
 //            }
 //        }
 
-        sem_wait(&airport.kiosks[kioskIndex].belts[beltIndex].kioskFull);
-        //sem_post(&airport.kiosks[kioskIndex].belts[beltIndex].kioskFull);
-        //printf("hello");
+        sem_wait(&airport.kiosks[kioskIndex].kioskFull);
+
         printf("Passenger %d has started self check-in Kiosk %d Belt %d\n", passID, kioskIndex, beltIndex);
         pthread_mutex_lock(&kiosk);
-        airport.kiosks[kioskIndex].belts[beltIndex].passengers[airport.kiosks[kioskIndex].belts[beltIndex].currentPassenger] = passID;
-        airport.kiosks[kioskIndex].belts[beltIndex].currentPassenger++;
-        showBelt(kioskIndex,beltIndex);
-        pthread_mutex_unlock(&kiosk);
-
-
-
+        airport.kiosks[kioskIndex].passengers[airport.kiosks[kioskIndex].currentPassenger] = passID;
+        airport.kiosks[kioskIndex].currentPassenger++;
+        //showKiosk(kioskIndex);
         sleep(w);
-        pthread_mutex_lock(&belt);
-        printf("Passenger %d is in the security check of Kiosk %d Belt %d\n", passID, kioskIndex, beltIndex);
-        sleep(x);
-        passBelt(kioskIndex,beltIndex,passID);
-        sem_post(&airport.kiosks[kioskIndex].belts[beltIndex].kioskFull);
-        printf("Passenger %d is going out from Kiosk %d Belt %d\n", passID, kioskIndex, beltIndex);
-        showBelt(kioskIndex,beltIndex);
-        pthread_mutex_unlock(&belt);
+        pthread_mutex_unlock(&kiosk);
+        printf("Passenger %d has done self check-in Kiosk %d Belt %d\n", passID, kioskIndex, beltIndex);
+        passKiosk(kioskIndex,passID);
+        sem_post(&airport.kiosks[kioskIndex].kioskFull);
+//        pthread_mutex_lock(&belt);
+//        printf("Passenger %d is in the security check of Kiosk %d Belt %d\n", passID, kioskIndex, beltIndex);
+//        sleep(x);
+//        //passBelt(kioskIndex,beltIndex,passID);
+//        printf("Passenger %d is going out from Kiosk %d Belt %d\n", passID, kioskIndex, beltIndex);
+//        pthread_mutex_unlock(&belt);
+        //sem_post(&airport.kiosks[kioskIndex].belts[beltIndex].kioskFull);
+
+        //showBelt(kioskIndex,beltIndex);
+
 
     }
     //pthread_mutex_unlock(&mutex);
@@ -141,26 +147,19 @@ int main (int argc, char *argv[]) {
     int rc;
     pthread_mutex_init(&kiosk,NULL);
     pthread_mutex_init(&belt,NULL);
-//    printf("Input M:");
-//    scanf("%d\n",M);
-//    printf("\n");
-//    printf("%d\n",M);
-//    for(int i=0;i<M;i++){
-//        KIOSK[i]=-1;
-//    }
-//    printf("%d",KIOSK[M-2]);
+
     for(int i=0;i<M;i++){
-        for(int j=0;j<N;j++){
-            airport.kiosks[i].belts[j].currentPassenger=0;
-            airport.kiosks[i].belts[j].maximumPassenger=P;
-            sem_init(&airport.kiosks[i].belts[j].kioskFull,0,P);
+
+            airport.kiosks[i].currentPassenger=0;
+            airport.kiosks[i].maximumPassenger=P*P;
+            sem_init(&airport.kiosks[i].kioskFull,0,P*P);
             for(int k=0;k<5;k++){
-                airport.kiosks[i].belts[j].passengers[k]=-1;
+                airport.kiosks[i].passengers[k]=-1;
                 //printf("Kiosk %d belt %d passenger number %d\n",i,j,k);
             }
-        }
+
     }
-    sem_init(&kioskFull,0,0);
+    //sem_init(&kioskFull,0,0);
     for(int t=0; t<NUM_THREADS; t++){
         passengerArray[t].id=t;
         if(t%2==0){
