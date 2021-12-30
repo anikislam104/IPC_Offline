@@ -369,9 +369,26 @@ void *Process(void *threadarg) {
         printf("Passenger %d has finished self check-in Kiosk %d at time %d\n", passID, kioskIndex,ptime);
         passKiosk(kioskIndex,passID);
         sem_post(&airport.kiosks[kioskIndex].kioskFull);
-        ptime++;
+        //ptime++;
+
+
 
         //VIP CHANNEL
+        airport.viPchannel.waiting++;
+
+        while(1){
+            ptime++;
+            if(addGoing(passID)==1){
+                printf("Passenger %d is going  to boarding via VIP channel at time %d\n",passID,ptime);
+                airport.viPchannel.waiting--;
+                break;
+            }
+            //printf("looped");
+        }
+        passGoing(passID);
+        ptime+=z;
+
+
 
 
         //BOARDING
@@ -380,14 +397,91 @@ void *Process(void *threadarg) {
         printf("Passenger %d has started waiting to be boarded at time %d\n",passID,ptime);
         addPassengerInBoardingLine(passID);
         ptime+=(airport.boarding.currentPassenger-1)*y;
-        pthread_mutex_lock(&boarding);
-        printf("Passenger %d has started boarding the plane at time %d\n",passID,ptime);
-        ptime+=y;
-        //printf("%d\n",airport.boarding.currentPassenger);
-        passBoarding(passID);
-        //printf("%d\n",airport.boarding.currentPassenger);
-        printf("Passenger %d has boarded the plane at time %d\n",passID,ptime);
-        pthread_mutex_unlock(&boarding);
+        //pthread_mutex_lock(&boarding);
+        if(passID==0) {
+            printf("Passenger %d has started boarding the plane at time %d\n", passID, ptime);
+            ptime += y;
+            //sem_wait(&airport.boarding.boarding);
+            pthread_mutex_lock(&boarding);
+            passBoarding(passID);
+
+            pthread_mutex_unlock(&boarding);
+            //sem_post(&airport.boarding.boarding);
+            printf("Passenger %d has boarded the plane at time %d\n", passID, ptime);
+        }
+        else{
+            passBoarding(passID);
+            //sem_wait(&airport.boarding.boarding);
+//            pthread_mutex_lock(&boarding);
+            printf("Passenger %d has started boarding the plane at time %d\n", passID, ptime);
+            printf("Passenger %d has lost his boarding pass.\nNow he has to go back to kiosk via VIP channel at time %d\n",passID,ptime);
+            int isComingBack=0;
+            while (isComingBack==0){
+                if(addVIPChannelComingBack(passID)==1){
+                    ptime++;
+                    isComingBack=1;
+                    printf("Passenger %d is going back to special kiosk via VIP channel at time %d\n",passID,ptime);
+
+                    //sem_post(&airport.boarding.boarding);
+                }
+
+            }
+            //pthread_mutex_unlock(&boarding);
+
+            //SPECIAL KIOSK
+            pthread_mutex_lock(&vipCh);
+            passComingBack(passID);
+            //printf("%d",airport.viPchannel.comingBack);
+            ptime+=z;
+            pthread_mutex_unlock(&vipCh);
+
+            sem_wait(&airport.specialKiosk.kioskFull);
+            printf("Passenger %d has started self check-in Special Kiosk  at time %d\n", passID,ptime);
+            pthread_mutex_lock(&spkiosk);
+            airport.specialKiosk.passengers[airport.specialKiosk.currentPassenger] = passID;
+            airport.specialKiosk.currentPassenger++;
+            //showKiosk(kioskIndex);
+            sleep(w);
+            ptime+=w;
+            pthread_mutex_unlock(&spkiosk);
+
+            printf("Passenger %d has finished self check-in Special Kiosk  at time %d\n", passID,ptime);
+//            printf("%d\n",airport.viPchannel.comingBack);
+            passSpecialKiosk(passID);
+            sem_post(&airport.specialKiosk.kioskFull);
+            //ptime++;
+
+
+            //VIP CHANNEL
+            airport.viPchannel.waiting++;
+
+            while(1){
+                ptime++;
+                if(addGoing(passID)==1){
+                    printf("Passenger %d is going back to boarding via VIP channel at time %d\n",passID,ptime);
+                    airport.viPchannel.waiting--;
+                    break;
+                }
+                //printf("looped");
+            }
+            passGoing(passID);
+            ptime+=z;
+            printf("Passenger %d has started waiting to be boarded at time %d\n",passID,ptime);
+            //printf("%d\n",airport.boarding.currentPassenger);
+            addPassengerInBoardingLine(passID);
+            ptime+=(airport.boarding.currentPassenger-1)*y;
+
+            //pthread_mutex_lock(&boarding);
+            printf("Passenger %d has started boarding the plane at time %d\n", passID, ptime);
+            ptime += y;
+            //sem_wait(&airport.boarding.boarding);
+            pthread_mutex_lock(&boarding);
+            passBoarding(passID);
+            pthread_mutex_unlock(&boarding);
+            //sem_post(&airport.boarding.boarding);
+            printf("Passenger %d has boarded the plane at time %d\n", passID, ptime);
+
+        }
 
     }
     //pthread_mutex_unlock(&mutex);
