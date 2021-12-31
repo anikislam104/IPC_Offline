@@ -9,7 +9,7 @@
 #include "semaphore.h"
 #include "time.h"
 #include "math.h"
-#define NUM_THREADS	4
+#define NUM_THREADS	6
 //#define M 5
 //#define N 3
 //#define P 5
@@ -201,9 +201,10 @@ int getTime(clock_t start,clock_t end){
     double t=((double )end-(double )start)/CLOCKS_PER_SEC;
     t= round(t);
     int t1=(int)t;
+    //printf("time %d",t1);
     return t1;
 }
-double t;
+int t;
 void passSpecialKiosk(int pass){
     airport.specialKiosk.passengers[airport.specialKiosk.currentPassenger-1] = -1;
     //airport.viPchannel.comingBack=0;
@@ -233,7 +234,7 @@ void *Process(void *threadarg) {
         beltIndex =(random++)%N;
         if(random==55) random=0;
 
-        //KIOSK CHECK-IN
+        ///KIOSK CHECK-IN
 
         //sem_wait(&airport.kiosks[kioskIndex].kioskFull);
         //printf("%d\n",airport.kiosks[kioskIndex].currentPassenger);
@@ -242,13 +243,24 @@ void *Process(void *threadarg) {
 //        }
         airport.kiosks[kioskIndex].passengers[airport.kiosks[kioskIndex].currentPassenger] = passID;
         airport.kiosks[kioskIndex].currentPassenger++;
-        start=clock();
+        clock_t s=clock();
+        sem_wait(&airport.kiosks[kioskIndex].kioskFull);
         pthread_mutex_lock(&airport.kiosks[kioskIndex].mutex);
-        end=clock();
-        int t= getTime(start,end);
+        clock_t e=clock();
+        double td=((double )e-(double )s)/CLOCKS_PER_SEC;
+        td= round(td);
+        t=(int)td;
         //printf("pass time %d\n",t);
+        //printf("%d and %d of %d\n",ptime,t,passID);
         ptime+=t;
+        //clock_t s1=clock();
         sleep(w);
+//        clock_t e1=clock();
+//        double t1=((double )e1-(double )s1)/CLOCKS_PER_SEC;
+//        t1= round(t1);
+//        t=(int)t1;
+//        //printf("sleep %f\n", ((double)(time(0))-(double )start)/CLOCKS_PER_SEC);
+//        printf("%d and %d of %d sleep\n",w,t,passID);
         //ptime+=airport.kiosks[kioskIndex].currentPassenger*w;
         printf("Passenger %d has started self check-in Kiosk %d at time %d\n", passID, kioskIndex,ptime);
         //printf("%d\n",airport.kiosks[kioskIndex].currentPassenger);
@@ -257,22 +269,28 @@ void *Process(void *threadarg) {
         pthread_mutex_unlock(&airport.kiosks[kioskIndex].mutex);
         printf("Passenger %d has finished self check-in Kiosk %d at time %d\n", passID, kioskIndex,ptime);
         passKiosk(kioskIndex,passID);
-        //sem_post(&airport.kiosks[kioskIndex].kioskFull);
+        sem_post(&airport.kiosks[kioskIndex].kioskFull);
         ptime++;
         sleep(1);
 
 
-        //SECURITY CHECK(BELT)
+        ///SECURITY CHECK(BELT)
 
 
         //pthread_mutex_lock(&belt);
-
+        printf("Passenger %d has started waiting for security check in belt %d from time %d\n", passID, beltIndex, ptime);
+        clock_t s1=clock();
         sem_wait(&airport.belts[beltIndex].beltFull);
         //ptime+=airport.belts[beltIndex].currentPassenger*x;
-        printf("Passenger %d has started waiting for security check in belt %d from time %d\n", passID, beltIndex, ptime);
         airport.belts[beltIndex].passengers[airport.belts[beltIndex].currentPassenger]=passID;
         airport.belts[beltIndex].currentPassenger++;
         pthread_mutex_lock(&airport.belts[beltIndex].mutex);
+        clock_t e1=clock();
+        double t1=((double )e1-(double )s1)/CLOCKS_PER_SEC;
+        t1= round(t1);
+        t=(int)t1;
+        ptime+=t;
+        printf("belt %d\n",t);
         printf("Passenger %d has started the security check at time %d\n",passID,ptime);
         ptime+=x;
         sleep(x);
@@ -284,18 +302,27 @@ void *Process(void *threadarg) {
 
 
 
-        //BOARDING
+        ///BOARDING
+
+
+
         //sem_wait(&airport.boarding.boarding);
         ptime++;
         sleep(1);
         printf("Passenger %d has started waiting to be boarded at time %d\n",passID,ptime);
         addPassengerInBoardingLine(passID);
-        ptime+=(airport.boarding.currentPassenger-1)*y;
-        sleep((airport.boarding.currentPassenger-1)*y);
+//        ptime+=(airport.boarding.currentPassenger-1)*y;
+//        sleep((airport.boarding.currentPassenger-1)*y);
         //pthread_mutex_lock(&boarding);
-        if(passID==0) {
+        if(passID==0 || passID ==1) {
             printf("Passenger %d has started boarding the plane at time %d\n", passID, ptime);
+            clock_t s2=clock();
             pthread_mutex_lock(&airport.boarding.mutex);
+            clock_t e2=clock();
+            double t2=((double )e2-(double )s2)/CLOCKS_PER_SEC;
+            t2= round(t2);
+            t=(int)t2;
+            ptime+=t;
             sleep(y);
             ptime += y;
             pthread_mutex_unlock(&airport.boarding.mutex);
@@ -303,7 +330,15 @@ void *Process(void *threadarg) {
             printf("Passenger %d has boarded the plane at time %d\n", passID, ptime);
         }
         else{
+            clock_t s2=clock();
+            pthread_mutex_lock(&airport.boarding.mutex);
+            clock_t e2=clock();
+            double t2=((double )e2-(double )s2)/CLOCKS_PER_SEC;
+            t2= round(t2);
+            t=(int)t2;
+            ptime+=t;
             passBoarding(passID);
+            pthread_mutex_unlock(&airport.boarding.mutex);
             printf("Passenger %d has started boarding the plane at time %d\n", passID, ptime);
             printf("Passenger %d has lost his boarding pass.\nNow he has to go back to kiosk via VIP channel at time %d\n",passID,ptime);
             int isComingBack=0;
@@ -320,7 +355,10 @@ void *Process(void *threadarg) {
 
 
 
-            //SPECIAL KIOSK
+            ///VIP CHANNEL
+
+
+
             pthread_mutex_lock(&airport.viPchannel.mutex);
             passComingBack(passID);
             ptime+=z;
@@ -329,7 +367,7 @@ void *Process(void *threadarg) {
 
 
 
-            //SPECIAL KIOSK
+            ///SPECIAL KIOSK
 
             //sem_wait(&airport.specialKiosk.kioskFull);
             ptime+=airport.specialKiosk.currentPassenger*w;
@@ -349,9 +387,11 @@ void *Process(void *threadarg) {
             //ptime++;
 
 
-            //VIP CHANNEL
-            airport.viPchannel.waiting++;
+            ///VIP CHANNEL
 
+
+
+            airport.viPchannel.waiting++;
             while(1){
                 ptime++;
                 sleep(1);
@@ -388,11 +428,13 @@ void *Process(void *threadarg) {
 
 
 
-        //FOR VIPs
+        ///FOR VIPs  FOR VIPs  FOR VIPs  FOR VIPs  FOR VIPs  FOR VIPs
 
 
 
     else{
+
+
         //ptime+=7;
         //printf("ptime %d\n",airport.kiosks[kioskIndex].currentPassenger);
         kioskIndex = (random++)%M;
@@ -400,29 +442,36 @@ void *Process(void *threadarg) {
         if(random==55) random=0;
         //printf("ptime %d  %d\n",airport.kiosks[kioskIndex].currentPassenger,kioskIndex);
 
-        //KIOSK CHECK-IN
+        ///KIOSK CHECK-IN
 
 
-        if(airport.kiosks[kioskIndex].currentPassenger!=0) {
-            ptime += airport.kiosks[kioskIndex].currentPassenger * w;
-        }
+//        if(airport.kiosks[kioskIndex].currentPassenger!=0) {
+//            ptime += airport.kiosks[kioskIndex].currentPassenger * w;
+//        }
         //printf("ptime %d\n",airport.kiosks[kioskIndex].currentPassenger);
         //sem_wait(&airport.kiosks[kioskIndex].kioskFull);
         airport.kiosks[kioskIndex].passengers[airport.kiosks[kioskIndex].currentPassenger] = passID;
         airport.kiosks[kioskIndex].currentPassenger++;
+        clock_t s=clock();
+        sem_wait(&airport.kiosks[kioskIndex].kioskFull);
         pthread_mutex_lock(&airport.kiosks[kioskIndex].mutex);
+        clock_t e=clock();
+        double td=((double )e-(double )s)/CLOCKS_PER_SEC;
+        td= round(td);
+        t=(int)td;
+        ptime+=t;
         printf("Passenger %d has started self check-in Kiosk %d at time %d\n", passID, kioskIndex,ptime);
         sleep(w);
         ptime+=w;
         pthread_mutex_unlock(&airport.kiosks[kioskIndex].mutex);
         printf("Passenger %d has finished self check-in Kiosk %d at time %d\n", passID, kioskIndex,ptime);
         passKiosk(kioskIndex,passID);
-        //sem_post(&airport.kiosks[kioskIndex].kioskFull);
+        sem_post(&airport.kiosks[kioskIndex].kioskFull);
         //ptime++;
 
 
 
-        //VIP CHANNEL
+        ///VIP CHANNEL
 
 
         airport.viPchannel.waiting++;
@@ -443,7 +492,7 @@ void *Process(void *threadarg) {
 
 
 
-        //BOARDING
+        ///BOARDING
 
 
 
@@ -452,13 +501,18 @@ void *Process(void *threadarg) {
         sleep(1);
         printf("Passenger %d has started waiting to be boarded at time %d\n",passID,ptime);
         addPassengerInBoardingLine(passID);
-        ptime+=(airport.boarding.currentPassenger-1)*y;
-        sleep((airport.boarding.currentPassenger-1)*y);
+//        ptime+=(airport.boarding.currentPassenger-1)*y;
+//        sleep((airport.boarding.currentPassenger-1)*y);
         //pthread_mutex_lock(&boarding);
         if(passID==0) {
             printf("Passenger %d has started boarding the plane at time %d\n", passID, ptime);
-            //sem_wait(&airport.boarding.boarding);
+            clock_t s2=clock();
             pthread_mutex_lock(&airport.boarding.mutex);
+            clock_t e2=clock();
+            double t2=((double )e2-(double )s2)/CLOCKS_PER_SEC;
+            t2= round(t2);
+            t=(int)t2;
+            ptime+=t;
             sleep(y);
             ptime += y;
             pthread_mutex_unlock(&airport.boarding.mutex);
@@ -467,9 +521,15 @@ void *Process(void *threadarg) {
             printf("Passenger %d has boarded the plane at time %d\n", passID, ptime);
         }
         else{
+            clock_t s2=clock();
+            pthread_mutex_lock(&airport.boarding.mutex);
+            clock_t e2=clock();
+            double t2=((double )e2-(double )s2)/CLOCKS_PER_SEC;
+            t2= round(t2);
+            t=(int)t2;
+            ptime+=t;
             passBoarding(passID);
-            //sem_wait(&airport.boarding.boarding);
-//            pthread_mutex_lock(&boarding);
+            pthread_mutex_unlock(&airport.boarding.mutex);
             printf("Passenger %d has started boarding the plane at time %d\n", passID, ptime);
             printf("Passenger %d has lost his boarding pass.\nNow he has to go back to kiosk via VIP channel at time %d\n",passID,ptime);
             int isComingBack=0;
