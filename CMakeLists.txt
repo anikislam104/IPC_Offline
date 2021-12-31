@@ -14,5 +14,6 @@ add_executable(StackMng StackMng.c)
 add_executable(mutex mutex.c)
 add_executable(prodCons prodCons.c)
 add_executable(semaphore semaphore.c)
+add_executable(fileRead fileRead.c)
 
 
