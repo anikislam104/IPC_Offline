@@ -197,12 +197,13 @@ void passGoing(int passID){
         }
     }
 }
-int getTime(double t){
+int getTime(clock_t start,clock_t end){
+    double t=((double )end-(double )start)/CLOCKS_PER_SEC;
     t= round(t);
-    int t1=(int )t;
+    int t1=(int)t;
     return t1;
 }
-
+double t;
 void passSpecialKiosk(int pass){
     airport.specialKiosk.passengers[airport.specialKiosk.currentPassenger-1] = -1;
     //airport.viPchannel.comingBack=0;
@@ -236,12 +237,17 @@ void *Process(void *threadarg) {
 
         //sem_wait(&airport.kiosks[kioskIndex].kioskFull);
         //printf("%d\n",airport.kiosks[kioskIndex].currentPassenger);
-        if(airport.kiosks[kioskIndex].currentPassenger!=0) {
-            ptime += airport.kiosks[kioskIndex].currentPassenger * w - 2;
-        }
+//        if(airport.kiosks[kioskIndex].currentPassenger!=0) {
+//            ptime += airport.kiosks[kioskIndex].currentPassenger * w - 2;
+//        }
         airport.kiosks[kioskIndex].passengers[airport.kiosks[kioskIndex].currentPassenger] = passID;
         airport.kiosks[kioskIndex].currentPassenger++;
+        start=clock();
         pthread_mutex_lock(&airport.kiosks[kioskIndex].mutex);
+        end=clock();
+        int t= getTime(start,end);
+        //printf("pass time %d\n",t);
+        ptime+=t;
         sleep(w);
         //ptime+=airport.kiosks[kioskIndex].currentPassenger*w;
         printf("Passenger %d has started self check-in Kiosk %d at time %d\n", passID, kioskIndex,ptime);
@@ -262,7 +268,7 @@ void *Process(void *threadarg) {
         //pthread_mutex_lock(&belt);
 
         sem_wait(&airport.belts[beltIndex].beltFull);
-        ptime+=airport.belts[beltIndex].currentPassenger*x;
+        //ptime+=airport.belts[beltIndex].currentPassenger*x;
         printf("Passenger %d has started waiting for security check in belt %d from time %d\n", passID, beltIndex, ptime);
         airport.belts[beltIndex].passengers[airport.belts[beltIndex].currentPassenger]=passID;
         airport.belts[beltIndex].currentPassenger++;
