@@ -317,7 +317,7 @@ void *Process(void *threadarg) {
 //        ptime+=(airport.boarding.currentPassenger-1)*y;
 //        sleep((airport.boarding.currentPassenger-1)*y);
         //pthread_mutex_lock(&boarding);
-        if(passID==-1) {
+        if(passID==1) {
             printf("Passenger %d has started boarding the plane at time %d\n\n", passID, ptime);
             clock_t s2=clock();
             pthread_mutex_lock(&airport.boarding.mutex);
@@ -543,7 +543,7 @@ void *Process(void *threadarg) {
 //        ptime+=(airport.boarding.currentPassenger-1)*y;
 //        sleep((airport.boarding.currentPassenger-1)*y);
         //pthread_mutex_lock(&boarding);
-        if(passID==-1) {
+        if(passID==0) {
             clock_t s2=clock();
             pthread_mutex_lock(&airport.boarding.mutex);
             clock_t e2=clock();
