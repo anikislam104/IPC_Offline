@@ -287,7 +287,7 @@ void *Process(void *threadarg) {
         //ptime+=airport.belts[beltIndex].currentPassenger*x;
         airport.belts[beltIndex].passengers[airport.belts[beltIndex].currentPassenger]=passID;
         airport.belts[beltIndex].currentPassenger++;
-        pthread_mutex_lock(&airport.belts[beltIndex].mutex);
+        //pthread_mutex_lock(&airport.belts[beltIndex].mutex);
         clock_t e1=clock();
         double t1=((double )e1-(double )s1)/CLOCKS_PER_SEC;
         t1= round(t1);
@@ -297,7 +297,7 @@ void *Process(void *threadarg) {
         printf("Passenger %d has started the security check at time %d\n\n",passID,ptime);
         ptime+=x;
         sleep(x);
-        pthread_mutex_unlock(&airport.belts[beltIndex].mutex);
+        //pthread_mutex_unlock(&airport.belts[beltIndex].mutex);
         passBelt(beltIndex,passID);
         sem_post(&airport.belts[beltIndex].beltFull);
         printf("Passenger %d has crossed the security check at time %d\n\n",passID,ptime);
