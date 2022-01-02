@@ -711,9 +711,9 @@ void *Process(void *threadarg) {
 //                //sem_post(&airport.boarding.boarding);
 //                fprintf(fp, "Passenger %d has boarded the plane at time %d\n\n", passID, ptime);
 
+                lid=rand()%100;
+                printf("lid %d for %d",lid,passID);
             }
-            lid=rand()%100;
-            printf("lid %d for %d",lid,passID);
         }
 
     }
