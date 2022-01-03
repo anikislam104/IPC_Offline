@@ -404,10 +404,11 @@ void *Process(void *threadarg) {
                 t5 = round(t5);
                 t = (int) t5;
                 ptime += t;
-                passGoing(passID);
                 sleep(z);
                 ptime += z;
+                passGoing(passID);
                 lid=rand()%1000;
+                printf("%d\n",lid);
             }
         }
 
@@ -469,10 +470,9 @@ void *Process(void *threadarg) {
         t7= round(t7);
         t=(int)t7;
         ptime+=t;
-        passGoing(passID);
         sleep(z);
         ptime+=z;
-
+        passGoing(passID);
 
 
 
@@ -592,10 +592,11 @@ void *Process(void *threadarg) {
                 t5 = round(t5);
                 t = (int) t5;
                 ptime += t;
-                passGoing(passID);
                 sleep(z);
                 ptime += z;
+                passGoing(passID);
                 lid=rand()%100;
+                printf("%d\n",lid);
             }
         }
 

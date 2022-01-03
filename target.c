@@ -15,14 +15,14 @@ int factorial(int n)
     }
     return s;
 }
-double poissonDist(int lambda,int x)
+double poissonDist(double lambda,double x)
 {
     //printf("%f  ",(double )lambda);
     double a= exp(-1.0*(double )lambda);
     //printf("%f   ",a);
     a=a*pow((double )lambda,(double )x);
     a=a/(double ) factorial(x);
-    int ans=(int )a;
+    //int ans=(int )a;
     return a;
 }
 double TestFunction(int max, int numIntervals,int x) {
@@ -42,8 +42,8 @@ double TestFunction(int max, int numIntervals,int x) {
 
 }
 int main(){
-    int lambda,x=1;
-    lambda=10;
+    double lambda=7.5,x=1;
+    //lambda=10;
     int maxTime=150000;
     int timePassed=0;
     for(int i=0;i<100;i++){
@@ -51,11 +51,12 @@ int main(){
             x = 1;
             timePassed+=maxTime-timePassed;
         }
-        int s=(int)(round(poissonDist(lambda,x)*1000000));
-        timePassed+=s/10;
+        double s=(poissonDist(lambda,x));
+        timePassed+=s;
         printf("%d %d\n",timePassed,s);
-        sleep((int)s/100000);
+        sleep((int)s);
         x++;
     }
-
+    double s= poissonDist(lambda,x);
+    printf("%f",s);
 }
