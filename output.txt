@@ -4,9 +4,9 @@ Passenger 0 (VIP) has started self check-in Kiosk 0 at time 0
 
 Passenger 0 (VIP) has finished self check-in Kiosk 0 at time 2
 
-Passenger 1 has arrived at the airport at time 2
-
 Passenger 0 (VIP) is going  to boarding via VIP channel at time 2
+
+Passenger 1 has arrived at the airport at time 2
 
 Passenger 1 has started self check-in Kiosk 2 at time 2
 
@@ -20,17 +20,17 @@ Now he has to go back to kiosk via VIP channel at time 3
 
 Passenger 0 (VIP) is going back to special kiosk via VIP channel at time 3
 
-Passenger 1 has finished self check-in Kiosk 2 at time 4
-
 Passenger 0 (VIP) has reached Special Kiosk  at time 4
 
-Passenger 1 has started waiting for security check in belt 0 from time 4
+Passenger 1 has finished self check-in Kiosk 2 at time 4
 
 Passenger 0 (VIP) has started self check-in Special Kiosk  at time 4
 
-Passenger 1 has started the security check at time 4
+Passenger 1 has started waiting for security check in belt 0 from time 4
 
 Passenger 2 (VIP) has arrived at the airport at time 4
+
+Passenger 1 has started the security check at time 4
 
 Passenger 2 (VIP) has started self check-in Kiosk 1 at time 4
 
@@ -46,23 +46,23 @@ Now he has to go back to kiosk via VIP channel at time 5
 
 Passenger 1 is going back to special kiosk via VIP channel at time 5
 
+Passenger 0 (VIP) has finished self check-in Special Kiosk  at time 6
+
 Passenger 2 (VIP) has finished self check-in Kiosk 1 at time 6
 
 Passenger 2 (VIP) is going  to boarding via VIP channel at time 6
 
 Passenger 1 has reached Special Kiosk  at time 6
 
-Passenger 0 (VIP) has finished self check-in Special Kiosk  at time 6
-
 Passenger 1 has started self check-in Special Kiosk  at time 6
 
 Passenger 0 (VIP) is going back to boarding via VIP channel at time 6
 
-Passenger 2 (VIP) has started waiting to be boarded at time 7
-
-Passenger 2 (VIP) has started boarding the plane at time 7
-
 Passenger 0 (VIP) has started waiting to be boarded at time 7
+
+Passenger 0 (VIP) has started boarding the plane at time 7
+
+Passenger 2 (VIP) has started waiting to be boarded at time 7
 
 Passenger 1 has finished self check-in Special Kiosk  at time 8
 
@@ -70,11 +70,11 @@ Passenger 1 is going back to boarding via VIP channel at time 8
 
 Passenger 1 has started waiting to be boarded at time 9
 
-Passenger 2 (VIP) has boarded the plane at time 17
+Passenger 0 (VIP) has boarded the plane at time 17
 
-Passenger 0 (VIP) has started boarding the plane at time 17
+Passenger 2 (VIP) has started boarding the plane at time 17
 
-Passenger 0 (VIP) has boarded the plane at time 27
+Passenger 2 (VIP) has boarded the plane at time 27
 
 Passenger 1 has started boarding the plane at time 27
 
