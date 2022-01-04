@@ -448,7 +448,7 @@ void *Process(void *threadarg) {
                 ptime += z;
                 passGoing(passID);
                 lid=rand()%1000;
-                printf("%d\n",lid);
+                //printf("%d\n",lid);
             }
         }
 
@@ -567,7 +567,7 @@ void *Process(void *threadarg) {
                 t3 = round(t3);
                 t = (int) t3;
                 ptime += t;
-                printf("%d\n",t);
+                //printf("%d\n",t);
                 fprintf(fp, "Passenger %d (VIP) is going back to special kiosk via VIP channel at time %d\n\n", passID,
                         ptime);
 
@@ -637,7 +637,7 @@ void *Process(void *threadarg) {
                 ptime += z;
                 passGoing(passID);
                 lid=rand()%100;
-                printf("%d\n",lid);
+                //printf("%d\n",lid);
             }
         }
 
@@ -726,7 +726,7 @@ int main()
             fprintf(fp,"Passenger %d has arrived at the airport at time %d\n\n",t,passengerArray[t].time);
         }
         int pdr=getPDR();
-        printf("%d\n",pdr);
+        //printf("%d\n",pdr);
         TIME+=pdr;
 
         rc= pthread_create(&passengers[t],NULL,Process,(void *)&passengerArray[t]);
