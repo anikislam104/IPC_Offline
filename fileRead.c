@@ -714,22 +714,22 @@ int main()
     airport.viPchannel.going=0;
     airport.viPchannel.waiting=0;
     airport.viPchannel.comingBack=0;
-    for(int t=0; t<NUM_THREADS; t++){
-        passengerArray[t].id=t;
-        passengerArray[t].lossID=t;
-        passengerArray[t].time=TIME;
-        if(t%2==0){
-            passengerArray[t].isVIP=1;
-            fprintf(fp,"Passenger %d (VIP) has arrived at the airport at time %d\n\n",t,passengerArray[t].time);
+    for(int t0=0; t0<NUM_THREADS; t0++){
+        passengerArray[t0].id=t0;
+        passengerArray[t0].lossID=t0;
+        passengerArray[t0].time=TIME;
+        if(t0%2==0){
+            passengerArray[t0].isVIP=1;
+            fprintf(fp,"Passenger %d (VIP) has arrived at the airport at time %d\n\n",t0,passengerArray[t0].time);
         } else{
-            passengerArray[t].isVIP=0;
-            fprintf(fp,"Passenger %d has arrived at the airport at time %d\n\n",t,passengerArray[t].time);
+            passengerArray[t0].isVIP=0;
+            fprintf(fp,"Passenger %d has arrived at the airport at time %d\n\n",t0,passengerArray[t0].time);
         }
         int pdr=getPDR();
         //printf("%d\n",pdr);
         TIME+=pdr;
 
-        rc= pthread_create(&passengers[t],NULL,Process,(void *)&passengerArray[t]);
+        rc= pthread_create(&passengers[t0],NULL,Process,(void *)&passengerArray[t0]);
         if(rc){
             fprintf(fp,"ERROR; return code from pthread_create() is %d\n\n", rc);
             exit(-1);
