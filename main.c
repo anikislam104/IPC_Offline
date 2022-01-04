@@ -5,7 +5,7 @@
 #include "semaphore.h"
 #include "time.h"
 #include "math.h"
-#define NUM_THREADS	15
+#define NUM_THREADS	6
 //#define M 5
 //#define N 3
 //#define P 5
@@ -209,7 +209,7 @@ int getTime(clock_t start,clock_t end){
     //fprintf(fp,"time %d",t1);
     return t1;
 }
-
+int t;
 void passSpecialKiosk(int pass){
     airport.specialKiosk.passengers[airport.specialKiosk.currentPassenger-1] = -1;
     //airport.viPchannel.comingBack=0;
@@ -221,11 +221,11 @@ int random=0;
 
 double U_Random();
 
-int possion()
+int possion()  /* 产生一个泊松分布的随机数，Lamda为总体平均数*/
 {
     double Lambda = 2, k = 0;
     long double p = 1.0;
-    long double l=exp(-Lambda);
+    long double l=exp(-Lambda);  /* 为了精度，才定义为long double的，exp(-Lambda)是接近0的小数*/
     while (p>=l)
     {
         double u = U_Random();
@@ -235,11 +235,11 @@ int possion()
     return k-1;
 }
 
-double U_Random()
+double U_Random()  /* 产生一个0~1之间的随机数 */
 {
     static int done = 0;
     int number;
-    if(!done)
+    if(!done)  /*srand种子只产生一次*/
     {
         srand((int)time(0));
         done = 1;
@@ -257,7 +257,7 @@ int getPDR(){
     return p;
 }
 
-int t;
+
 void *Process(void *threadarg) {
     int passID,vip,ptime,lid;
     struct passenger *passengerStatus;
@@ -714,27 +714,29 @@ int main()
     airport.viPchannel.going=0;
     airport.viPchannel.waiting=0;
     airport.viPchannel.comingBack=0;
-    for(int t=0; t<NUM_THREADS; t++){
-        passengerArray[t].id=t;
-        passengerArray[t].lossID=t;
-        passengerArray[t].time=TIME;
-        if(t%2==0){
-            passengerArray[t].isVIP=1;
-            fprintf(fp,"Passenger %d (VIP) has arrived at the airport at time %d\n\n",t,passengerArray[t].time);
+    int t0=0;
+    while(t0>-1){
+        passengerArray[t0].id=t0+1;
+        passengerArray[t0].lossID=t0+1;
+        passengerArray[t0].time=TIME;
+        if(t0%2==0){
+            passengerArray[t0].isVIP=1;
+            fprintf(fp,"Passenger %d (VIP) has arrived at the airport at time %d\n\n",passengerArray[t0].id,passengerArray[t0].time);
         } else{
-            passengerArray[t].isVIP=0;
-            fprintf(fp,"Passenger %d has arrived at the airport at time %d\n\n",t,passengerArray[t].time);
+            passengerArray[t0].isVIP=0;
+            fprintf(fp,"Passenger %d has arrived at the airport at time %d\n\n",passengerArray[t0].id,passengerArray[t0].time);
         }
         int pdr=getPDR();
         //printf("%d\n",pdr);
         TIME+=pdr;
 
-        rc= pthread_create(&passengers[t],NULL,Process,(void *)&passengerArray[t]);
+        rc= pthread_create(&passengers[t0],NULL,Process,(void *)&passengerArray[t0]);
         if(rc){
             fprintf(fp,"ERROR; return code from pthread_create() is %d\n\n", rc);
             exit(-1);
         }
         sleep(pdr);
+        t0++;
     }
     pthread_exit(NULL);
     return  0;
