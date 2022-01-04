@@ -5,7 +5,7 @@
 #include "semaphore.h"
 #include "time.h"
 #include "math.h"
-#define NUM_THREADS	3
+#define NUM_THREADS	15
 //#define M 5
 //#define N 3
 //#define P 5
@@ -218,6 +218,46 @@ void passSpecialKiosk(int pass){
 }
 //int peopleKiosk;
 int random=0;
+
+double U_Random();
+
+int possion()  /* 产生一个泊松分布的随机数，Lamda为总体平均数*/
+{
+    double Lambda = 2, k = 0;
+    long double p = 1.0;
+    long double l=exp(-Lambda);  /* 为了精度，才定义为long double的，exp(-Lambda)是接近0的小数*/
+    while (p>=l)
+    {
+        double u = U_Random();
+        p *= u;
+        k++;
+    }
+    return k-1;
+}
+
+double U_Random()  /* 产生一个0~1之间的随机数 */
+{
+    static int done = 0;
+    int number;
+    if(!done)  /*srand种子只产生一次*/
+    {
+        srand((int)time(0));
+        done = 1;
+    }
+    number=1+(int)(100.0*rand()/(RAND_MAX+1.0));
+    return number/100.0;
+}
+
+int getPDR(){
+    double u = U_Random ();
+    int p = possion ();
+
+    //printf("%f\n", u);
+    //printf("%d\n", p);
+    return p;
+}
+
+
 void *Process(void *threadarg) {
     int passID,vip,ptime,lid;
     struct passenger *passengerStatus;
@@ -527,6 +567,7 @@ void *Process(void *threadarg) {
                 t3 = round(t3);
                 t = (int) t3;
                 ptime += t;
+                printf("%d\n",t);
                 fprintf(fp, "Passenger %d (VIP) is going back to special kiosk via VIP channel at time %d\n\n", passID,
                         ptime);
 
@@ -684,14 +725,16 @@ int main()
             passengerArray[t].isVIP=0;
             fprintf(fp,"Passenger %d has arrived at the airport at time %d\n\n",t,passengerArray[t].time);
         }
-        TIME+=2;
+        int pdr=getPDR();
+        printf("%d\n",pdr);
+        TIME+=pdr;
 
         rc= pthread_create(&passengers[t],NULL,Process,(void *)&passengerArray[t]);
         if(rc){
             fprintf(fp,"ERROR; return code from pthread_create() is %d\n\n", rc);
             exit(-1);
         }
-        sleep(2);
+        sleep(pdr);
     }
     pthread_exit(NULL);
     return  0;

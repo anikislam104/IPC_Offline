@@ -209,7 +209,7 @@ int getTime(clock_t start,clock_t end){
     //fprintf(fp,"time %d",t1);
     return t1;
 }
-int t;
+
 void passSpecialKiosk(int pass){
     airport.specialKiosk.passengers[airport.specialKiosk.currentPassenger-1] = -1;
     //airport.viPchannel.comingBack=0;
