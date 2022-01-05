@@ -715,7 +715,7 @@ int main()
     airport.viPchannel.waiting=0;
     airport.viPchannel.comingBack=0;
     int t0=0;
-    while(t0>-1){
+    while(t0<3){
         passengerArray[t0].id=t0+1;
         passengerArray[t0].lossID=t0+1;
         passengerArray[t0].time=TIME;

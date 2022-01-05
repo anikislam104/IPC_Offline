@@ -5,7 +5,7 @@
 #include "semaphore.h"
 #include "time.h"
 #include "math.h"
-#define NUM_THREADS	15
+#define NUM_THREADS	6
 //#define M 5
 //#define N 3
 //#define P 5
@@ -71,7 +71,7 @@ struct Airport{
     struct Kiosk specialKiosk;
 };
 struct Airport airport;
-struct passenger passengerArray[NUM_THREADS];
+struct passenger passengerArray[1];
 //struct Kiosk kiosks[M];
 
 int isKioskFull(int kioskIndex,int beltIndex){
@@ -339,7 +339,7 @@ void *Process(void *threadarg) {
 
         int hasLost=0;
 
-                    ///loop
+        ///loop
 
         while (hasLost==0) {
             fprintf(fp, "Passenger %d has started waiting to be boarded at time %d\n\n", passID, ptime);
@@ -714,16 +714,17 @@ int main()
     airport.viPchannel.going=0;
     airport.viPchannel.waiting=0;
     airport.viPchannel.comingBack=0;
-    for(int t0=0; t0<NUM_THREADS; t0++){
-        passengerArray[t0].id=t0;
-        passengerArray[t0].lossID=t0;
+    int t0=0;
+    while(t0<3){
+        passengerArray[t0].id=t0+1;
+        passengerArray[t0].lossID=t0+1;
         passengerArray[t0].time=TIME;
         if(t0%2==0){
             passengerArray[t0].isVIP=1;
-            fprintf(fp,"Passenger %d (VIP) has arrived at the airport at time %d\n\n",t0,passengerArray[t0].time);
+            fprintf(fp,"Passenger %d (VIP) has arrived at the airport at time %d\n\n",passengerArray[t0].id,passengerArray[t0].time);
         } else{
             passengerArray[t0].isVIP=0;
-            fprintf(fp,"Passenger %d has arrived at the airport at time %d\n\n",t0,passengerArray[t0].time);
+            fprintf(fp,"Passenger %d has arrived at the airport at time %d\n\n",passengerArray[t0].id,passengerArray[t0].time);
         }
         int pdr=getPDR();
         //printf("%d\n",pdr);
@@ -735,6 +736,7 @@ int main()
             exit(-1);
         }
         sleep(pdr);
+        t0++;
     }
     pthread_exit(NULL);
     return  0;
