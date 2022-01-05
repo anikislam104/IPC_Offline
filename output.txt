@@ -1,0 +1,136 @@
+Passenger 1 has arrived at the airport at time 0
+
+Passenger 1 has started self check-in Kiosk 0 at time 0
+
+Passenger 1 has finished self check-in Kiosk 0 at time 1
+
+Passenger 1 has started waiting for security check in belt 1 from time 2
+
+Passenger 1 has started the security check at time 2
+
+Passenger 2 has arrived at the airport at time 3
+
+Passenger 2 has started self check-in Kiosk 0 at time 3
+
+Passenger 2 has finished self check-in Kiosk 0 at time 4
+
+Passenger 1 has crossed the security check at time 4
+
+Passenger 3 (VIP) has arrived at the airport at time 5
+
+Passenger 2 has started waiting for security check in belt 1 from time 5
+
+Passenger 2 has started the security check at time 5
+
+Passenger 3 (VIP) has started self check-in Kiosk 0 at time 5
+
+Passenger 1 has started waiting to be boarded at time 5
+
+Passenger 1 has started boarding the plane at time 5
+
+Passenger 1 has lost his boarding pass.
+
+Now he has to go back to kiosk via VIP channel.He started waiting from time 5
+
+Passenger 1 is going back to special kiosk via VIP channel at time 5
+
+Passenger 4 has arrived at the airport at time 6
+
+Passenger 3 (VIP) has finished self check-in Kiosk 0 at time 6
+
+Passenger 4 has started self check-in Kiosk 0 at time 6
+
+Passenger 4 has finished self check-in Kiosk 0 at time 7
+
+Passenger 2 has crossed the security check at time 7
+
+Passenger 5 has arrived at the airport at time 8
+
+Passenger 2 has started waiting to be boarded at time 8
+
+Passenger 2 has started boarding the plane at time 8
+
+Passenger 2 has lost his boarding pass.
+
+Now he has to go back to kiosk via VIP channel.He started waiting from time 8
+
+Passenger 4 has started waiting for security check in belt 1 from time 8
+
+Passenger 4 has started the security check at time 8
+
+Passenger 5 has started self check-in Kiosk 0 at time 8
+
+Passenger 5 has finished self check-in Kiosk 0 at time 9
+
+Passenger 5 has started waiting for security check in belt 1 from time 10
+
+Passenger 5 has started the security check at time 10
+
+Passenger 4 has crossed the security check at time 10
+
+Passenger 6 (VIP) has arrived at the airport at time 11
+
+Passenger 6 (VIP) has started self check-in Kiosk 0 at time 11
+
+Passenger 4 has started waiting to be boarded at time 11
+
+Passenger 4 has started boarding the plane at time 11
+
+Passenger 1 has reached Special Kiosk  at time 11
+
+Passenger 1 has started self check-in Special Kiosk  at time 11
+
+Passenger 3 (VIP) is going  to boarding via VIP channel at time 11
+
+Passenger 6 (VIP) has finished self check-in Kiosk 0 at time 12
+
+Passenger 5 has crossed the security check at time 12
+
+Passenger 1 has finished self check-in Special Kiosk  at time 12
+
+Passenger 6 (VIP) is going  to boarding via VIP channel at time 13
+
+Passenger 5 has started waiting to be boarded at time 13
+
+Passenger 1 is going back to boarding via VIP channel at time 13
+
+Passenger 4 has boarded the plane at time 14
+
+Passenger 5 has started boarding the plane at time 14
+
+Passenger 3 (VIP) has started waiting to be boarded at time 17
+
+Passenger 5 has boarded the plane at time 17
+
+Passenger 3 (VIP) has started boarding the plane at time 17
+
+Passenger 6 (VIP) has started waiting to be boarded at time 19
+
+Passenger 1 has started waiting to be boarded at time 19
+
+Passenger 2 is going back to special kiosk via VIP channel at time 19
+
+Passenger 3 (VIP) has boarded the plane at time 20
+
+Passenger 6 (VIP) has started boarding the plane at time 20
+
+Passenger 1 has started boarding the plane at time 23
+
+Passenger 6 (VIP) has boarded the plane at time 23
+
+Passenger 2 has reached Special Kiosk  at time 25
+
+Passenger 2 has started self check-in Special Kiosk  at time 25
+
+Passenger 1 has boarded the plane at time 26
+
+Passenger 2 has finished self check-in Special Kiosk  at time 26
+
+Passenger 2 is going back to boarding via VIP channel at time 27
+
+Passenger 2 has started waiting to be boarded at time 33
+
+Passenger 2 has started boarding the plane at time 33
+
+Passenger 2 has boarded the plane at time 36
+
