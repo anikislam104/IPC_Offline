@@ -403,18 +403,6 @@ void *Process(void *threadarg) {
                     ptime += t;
                     //pthread_mutex_unlock(&halt);
                 }
-//                else if(airport.viPchannel.comingBack==0){
-//                    clock_t s3 = clock();
-//                    pthread_mutex_lock(&halt);
-//                    clock_t e3 = clock();
-//                    double t3 = ((double) e3 - (double) s3) / CLOCKS_PER_SEC;
-//                    t3 = round(t3);
-//                    t = (int) t3;
-//                    ptime += t;
-//                    airport.viPchannel.halting--;
-//                    airport.viPchannel.comingBack++;
-//                    pthread_mutex_unlock(&halt);
-//                }
                 else{
                     if(airport.viPchannel.waiting==0 || airport.viPchannel.going==0){
                         airport.viPchannel.comingBack++;
@@ -497,19 +485,7 @@ void *Process(void *threadarg) {
                     //pthread_mutex_unlock(&waiting);
 
                 }
-//                else if(airport.viPchannel.going==0){
-//                    clock_t s5 = clock();
-//                    pthread_mutex_lock(&waiting);
-//                    clock_t e5 = clock();
-//                    double t5 = ((double) e5 - (double) s5) / CLOCKS_PER_SEC;
-//                    t5 = round(t5);
-//                    t = (int) t5;
-//                    ptime += t;
-//                    airport.viPchannel.going++;
-//                    airport.viPchannel.halting--;
-//                    pthread_mutex_unlock(&waiting);
-//
-//                }
+
                 else{
                     if(airport.viPchannel.comingBack==0) {
                         airport.viPchannel.going++;
@@ -519,7 +495,7 @@ void *Process(void *threadarg) {
                         clock_t s5 = clock();
                         pthread_mutex_lock(&waiting);
                         airport.viPchannel.going++;
-                        airport.viPchannel.halting--;
+                        airport.viPchannel.waiting--;
                         pthread_mutex_unlock(&waiting);
                         clock_t e5 = clock();
                         double t5 = ((double) e5 - (double) s5) / CLOCKS_PER_SEC;
@@ -625,7 +601,7 @@ void *Process(void *threadarg) {
                 clock_t s5 = clock();
                 pthread_mutex_lock(&waiting);
                 airport.viPchannel.going++;
-                airport.viPchannel.halting--;
+                airport.viPchannel.waiting--;
                 pthread_mutex_unlock(&waiting);
                 clock_t e5 = clock();
                 double t5 = ((double) e5 - (double) s5) / CLOCKS_PER_SEC;
@@ -706,18 +682,7 @@ void *Process(void *threadarg) {
                     ptime += t;
                     //pthread_mutex_unlock(&halt);
                 }
-//                else if(airport.viPchannel.comingBack==0){
-//                    clock_t s3 = clock();
-//                    pthread_mutex_lock(&halt);
-//                    clock_t e3 = clock();
-//                    double t3 = ((double) e3 - (double) s3) / CLOCKS_PER_SEC;
-//                    t3 = round(t3);
-//                    t = (int) t3;
-//                    ptime += t;
-//                    airport.viPchannel.halting--;
-//                    airport.viPchannel.comingBack++;
-//                    pthread_mutex_unlock(&halt);
-//                }
+
                 else{
                     if(airport.viPchannel.waiting==0 || airport.viPchannel.going==0){
                         airport.viPchannel.comingBack++;
@@ -813,19 +778,7 @@ void *Process(void *threadarg) {
                     //pthread_mutex_unlock(&waiting);
 
                 }
-//                else if(airport.viPchannel.going==0){
-//                    clock_t s5 = clock();
-//                    pthread_mutex_lock(&waiting);
-//                    clock_t e5 = clock();
-//                    double t5 = ((double) e5 - (double) s5) / CLOCKS_PER_SEC;
-//                    t5 = round(t5);
-//                    t = (int) t5;
-//                    ptime += t;
-//                    airport.viPchannel.going++;
-//                    airport.viPchannel.halting--;
-//                    pthread_mutex_unlock(&waiting);
-//
-//                }
+
                 else{
                     if(airport.viPchannel.comingBack==0) {
                         airport.viPchannel.going++;
@@ -944,7 +897,8 @@ int main()
         passengerArray[t0].id=t0+1;
         passengerArray[t0].lossID=t0+1;
         passengerArray[t0].time=TIME;
-        if(t0%2!=0){
+//        int r= getPDR(7);
+        if(t0%3==0){
             passengerArray[t0].isVIP=1;
             fprintf(fp,"Passenger %d (VIP) has arrived at the airport at time %d\n\n",passengerArray[t0].id,passengerArray[t0].time);
         } else{
