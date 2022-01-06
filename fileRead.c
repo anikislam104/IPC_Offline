@@ -350,7 +350,7 @@ void *Process(void *threadarg) {
         while (hasLost==0) {
             fprintf(fp, "Passenger %d has started waiting to be boarded at time %d\n\n", passID, ptime);
             addPassengerInBoardingLine(passID);
-            if (lid != 1 && lid !=2 ) {
+            if (lid %3==0 ) {
                 clock_t s2 = clock();
                 pthread_mutex_lock(&airport.boarding.mutex);
                 clock_t e2 = clock();
@@ -621,7 +621,7 @@ void *Process(void *threadarg) {
         while(hasLost==0) {
             fprintf(fp, "Passenger %d (VIP) has started waiting to be boarded at time %d\n\n", passID, ptime);
             addPassengerInBoardingLine(passID);
-            if (lid!=-1) {
+            if (lid%3==0) {
                 clock_t s2 = clock();
                 pthread_mutex_lock(&airport.boarding.mutex);
                 clock_t e2 = clock();
@@ -873,11 +873,11 @@ int main()
     airport.viPchannel.comingBack=0;
     airport.viPchannel.halting=0;
     int t0=0;
-    while(t0<6){
+    while(t0<10){
         passengerArray[t0].id=t0+1;
         passengerArray[t0].lossID=t0+1;
         passengerArray[t0].time=TIME;
-        if(t0%3==2){
+        if(t0%3==0){
             passengerArray[t0].isVIP=1;
             fprintf(fp,"Passenger %d (VIP) has arrived at the airport at time %d\n\n",passengerArray[t0].id,passengerArray[t0].time);
         } else{
