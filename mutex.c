@@ -349,7 +349,7 @@ void *Process(void *threadarg) {
         while (hasLost==0) {
             fprintf(fp, "Passenger %d has started waiting to be boarded at time %d\n\n", passID, ptime);
             addPassengerInBoardingLine(passID);
-            if (lid %5!=0 ) {
+            if (lid !=1 ) {
                 clock_t s2 = clock();
                 pthread_mutex_lock(&airport.boarding.mutex);
                 clock_t e2 = clock();
@@ -813,19 +813,7 @@ void *Process(void *threadarg) {
                     //pthread_mutex_unlock(&waiting);
 
                 }
-//                else if(airport.viPchannel.going==0){
-//                    clock_t s5 = clock();
-//                    pthread_mutex_lock(&waiting);
-//                    clock_t e5 = clock();
-//                    double t5 = ((double) e5 - (double) s5) / CLOCKS_PER_SEC;
-//                    t5 = round(t5);
-//                    t = (int) t5;
-//                    ptime += t;
-//                    airport.viPchannel.going++;
-//                    airport.viPchannel.halting--;
-//                    pthread_mutex_unlock(&waiting);
-//
-//                }
+
                 else{
                     if(airport.viPchannel.comingBack==0) {
                         airport.viPchannel.going++;
@@ -940,11 +928,11 @@ int main()
     airport.viPchannel.comingBack=0;
     airport.viPchannel.halting=0;
     int t0=0;
-    while(t0>-1){
+    while(t0<4){
         passengerArray[t0].id=t0+1;
         passengerArray[t0].lossID=t0+1;
         passengerArray[t0].time=TIME;
-        if(t0%2!=0){
+        if(t0!=0){
             passengerArray[t0].isVIP=1;
             fprintf(fp,"Passenger %d (VIP) has arrived at the airport at time %d\n\n",passengerArray[t0].id,passengerArray[t0].time);
         } else{
@@ -954,14 +942,14 @@ int main()
         double lambda=3600/1800;
         int pdr=getPDR(lambda);
         //fprintf(fp,"%d\n",pdr);
-        TIME+=pdr;
+        TIME+=3;
 
         rc= pthread_create(&passengers[t0],NULL,Process,(void *)&passengerArray[t0]);
         if(rc){
             fprintf(fp,"ERROR; return code from pthread_create() is %d\n\n", rc);
             exit(-1);
         }
-        sleep(pdr);
+        sleep(3);
         t0++;
     }
     pthread_exit(NULL);
