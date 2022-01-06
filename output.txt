@@ -4,75 +4,83 @@ Passenger 1 has started self check-in Kiosk 0 at time 0
 
 Passenger 1 has finished self check-in Kiosk 0 at time 1
 
-Passenger 1 has started waiting for security check in belt 1 from time 1
+Passenger 1 has started waiting for security check in belt 1 from time 2
 
-Passenger 1 has started the security check at time 1
+Passenger 1 has started the security check at time 2
 
-Passenger 1 has crossed the security check at time 2
+Passenger 1 has crossed the security check at time 3
 
-Passenger 1 has started waiting to be boarded at time 2
+Passenger 1 has started waiting to be boarded at time 4
 
-Passenger 1 has started boarding the plane at time 2
+Passenger 1 has started boarding the plane at time 4
 
 Passenger 1 has lost his boarding pass.
 
-Now he has to go back to kiosk via VIP channel.He started waiting from time 2
+Now he has to go back to kiosk via VIP channel.He started waiting from time 4
 
-Passenger 1 is going back to special kiosk via VIP channel at time 2
+Passenger 1 is going back to special kiosk via VIP channel at time 4
 
-Passenger 2 (VIP) has arrived at the airport at time 3
+Passenger 2 has arrived at the airport at time 6
 
-Passenger 2 (VIP) has started self check-in Kiosk 0 at time 3
+Passenger 2 has started self check-in Kiosk 0 at time 6
 
-Passenger 2 (VIP) has finished self check-in Kiosk 0 at time 4
+Passenger 2 has finished self check-in Kiosk 0 at time 7
 
-Passenger 3 (VIP) has arrived at the airport at time 6
+Passenger 2 has started waiting for security check in belt 1 from time 8
 
-Passenger 3 (VIP) has started self check-in Kiosk 0 at time 6
+Passenger 2 has started the security check at time 8
 
-Passenger 3 (VIP) has finished self check-in Kiosk 0 at time 7
+Passenger 3 (VIP) has arrived at the airport at time 9
 
-Passenger 4 (VIP) has arrived at the airport at time 9
+Passenger 3 (VIP) has started self check-in Kiosk 0 at time 9
 
-Passenger 4 (VIP) has started self check-in Kiosk 0 at time 9
+Passenger 2 has crossed the security check at time 9
 
-Passenger 4 (VIP) has finished self check-in Kiosk 0 at time 10
+Passenger 3 (VIP) has finished self check-in Kiosk 0 at time 10
 
-Passenger 1 has reached Special Kiosk  at time 17
+Passenger 2 has started waiting to be boarded at time 10
 
-Passenger 2 (VIP) is going back to boarding via VIP channel at time 17
+Passenger 2 has started boarding the plane at time 10
 
-Passenger 3 (VIP) is going back to boarding via VIP channel at time 17
+Passenger 2 has lost his boarding pass.
 
-Passenger 1 has started self check-in Special Kiosk  at time 17
+Now he has to go back to kiosk via VIP channel.He started waiting from time 10
 
-Passenger 4 (VIP) is going back to boarding via VIP channel at time 17
+Passenger 2 is going back to special kiosk via VIP channel at time 10
 
-Passenger 1 has finished self check-in Special Kiosk  at time 18
+Passenger 1 has reached Special Kiosk  at time 19
 
-Passenger 1 is going back to boarding via VIP channel at time 18
+Passenger 1 has started self check-in Special Kiosk  at time 19
 
-Passenger 2 (VIP) has started waiting to be boarded at time 32
+Passenger 1 has finished self check-in Special Kiosk  at time 20
 
-Passenger 3 (VIP) has started waiting to be boarded at time 32
+Passenger 2 has reached Special Kiosk  at time 25
 
-Passenger 2 (VIP) has started boarding the plane at time 32
+Passenger 2 has started self check-in Special Kiosk  at time 25
 
-Passenger 4 (VIP) has started waiting to be boarded at time 32
+Passenger 3 (VIP) is going  to boarding via VIP channel at time 25
 
-Passenger 1 has started waiting to be boarded at time 33
+Passenger 1 is going back to boarding via VIP channel at time 25
 
-Passenger 2 (VIP) has boarded the plane at time 34
+Passenger 2 has finished self check-in Special Kiosk  at time 26
 
-Passenger 3 (VIP) has started boarding the plane at time 34
+Passenger 2 is going back to boarding via VIP channel at time 27
 
-Passenger 3 (VIP) has boarded the plane at time 36
+Passenger 3 (VIP) has started waiting to be boarded at time 40
 
-Passenger 4 (VIP) has started boarding the plane at time 36
+Passenger 1 has started waiting to be boarded at time 40
 
-Passenger 4 (VIP) has boarded the plane at time 38
+Passenger 3 (VIP) has started boarding the plane at time 40
 
-Passenger 1 has started boarding the plane at time 38
+Passenger 3 (VIP) has boarded the plane at time 42
 
-Passenger 1 has boarded the plane at time 40
+Passenger 1 has started boarding the plane at time 42
+
+Passenger 2 has started waiting to be boarded at time 42
+
+Passenger 1 has boarded the plane at time 44
+
+Passenger 2 has started boarding the plane at time 44
+
+Passenger 2 has boarded the plane at time 46
 

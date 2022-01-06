@@ -905,14 +905,14 @@ int main()
         double lambda=3600/1800;
         int pdr=getPDR(lambda);
         //fprintf(fp,"%d\n",pdr);
-        TIME+=1;
+        TIME+=pdr;
 
         rc= pthread_create(&passengers[t0],NULL,Process,(void *)&passengerArray[t0]);
         if(rc){
             fprintf(fp,"ERROR; return code from pthread_create() is %d\n\n", rc);
             exit(-1);
         }
-        sleep(1);
+        sleep(pdr);
         t0++;
     }
     pthread_exit(NULL);
