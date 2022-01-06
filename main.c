@@ -349,7 +349,7 @@ void *Process(void *threadarg) {
         while (hasLost==0) {
             fprintf(fp, "Passenger %d has started waiting to be boarded at time %d\n\n", passID, ptime);
             addPassengerInBoardingLine(passID);
-            if (lid %3!=0 ) {
+            if (lid %5!=0 ) {
                 clock_t s2 = clock();
                 pthread_mutex_lock(&airport.boarding.mutex);
                 clock_t e2 = clock();
@@ -632,7 +632,7 @@ void *Process(void *threadarg) {
         while(hasLost==0) {
             fprintf(fp, "Passenger %d (VIP) has started waiting to be boarded at time %d\n\n", passID, ptime);
             addPassengerInBoardingLine(passID);
-            if (lid %3!=0) {
+            if (lid %5!=0) {
                 clock_t s2 = clock();
                 pthread_mutex_lock(&airport.boarding.mutex);
                 clock_t e2 = clock();
